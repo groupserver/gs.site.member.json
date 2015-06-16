@@ -17,9 +17,11 @@ from json import dumps as to_json
 from logging import getLogger
 log = getLogger('gs.site.member.json.members')
 from zope.cachedescriptors.property import Lazy
+from zope.component import createObject
 from zope.formlib import form
 from gs.auth.token import log_auth_error
 from gs.content.form.api.json import SiteEndpoint
+from gs.group.member.base import user_member_of_group
 from gs.site.member.base import SiteMembers
 from .interfaces import IMembersList
 
@@ -34,6 +36,15 @@ class MembersListHook(SiteEndpoint):
         retval = SiteMembers(self.context)
         return retval
 
+    @Lazy
+    def groups(self):
+        FOLDER_TYPES = ['Folder', 'Folder (ordered)']
+        groups = getattr(self.context, 'groups')
+        retval = [folder
+                  for folder in groups.objectValues(FOLDER_TYPES)
+                  if folder.getProperty('is_group', False)]
+        return retval
+
     @form.action(label='List', name='list', prefix='',
                  failure='handle_list_failure')
     def handle_get_list(self, action, data):
@@ -41,7 +52,7 @@ class MembersListHook(SiteEndpoint):
 
 :param action: The button that was clicked.
 :param dict data: The form data.'''
-        retval = to_json(self.sitemembers.memberIds)
+        retval = to_json(self.siteMembers.memberIds)
         return retval
 
     @form.action(label='Groups', name='groups', prefix='',
@@ -51,8 +62,21 @@ class MembersListHook(SiteEndpoint):
 
 :param action: The button that was clicked.
 :param dict data: The form data.'''
-        r = []
-        retval = to_json(r)
+        usergroups = []
+        for userId in self.siteMembers.memberIds:
+            userInfo = createObject('groupserver.UserFromId',
+                                    self.context, userId)
+            groups = [group.getId()
+                      for group in self.groups
+                      if user_member_of_group(userInfo, group)]
+            u = ''.join((self.siteInfo.url, userInfo.url))
+            r = {'id': userInfo.id,
+                 'name': userInfo.name,
+                 'url': u,
+                 'groups': groups}
+            usergroups.append(r)
+
+        retval = to_json(usergroups)
         return retval
 
     def handle_list_failure(self, action, data, errors):
