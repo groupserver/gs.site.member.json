@@ -22,6 +22,7 @@ from zope.formlib import form
 from gs.auth.token import log_auth_error
 from gs.content.form.api.json import SiteEndpoint
 from gs.group.member.base import user_member_of_group
+from gs.profile.email.base import EmailUser
 from gs.site.member.base import SiteMembers
 from .interfaces import IMembersList
 
@@ -45,7 +46,19 @@ class MembersListHook(SiteEndpoint):
                   if folder.getProperty('is_group', False)]
         return retval
 
-    @form.action(label='List', name='list', prefix='',
+    def email_info(self, userInfo):
+        eu = EmailUser(self.context, userInfo)
+        allEmail = eu.get_addresses()
+        preferred = eu.get_delivery_addresses()
+        unverified = eu.get_unverified_addresses()
+        other = list(set(allEmail) - set(preferred) - set(unverified))
+        retval = {'all': allEmail,
+                  'preferred': preferred,
+                  'other': other,
+                  'unverified': unverified, }
+        return retval
+
+    @form.action(label='Users', name='users', prefix='',
                  failure='handle_list_failure')
     def handle_get_list(self, action, data):
         '''The form action for the *simple* list
@@ -55,8 +68,8 @@ class MembersListHook(SiteEndpoint):
         retval = to_json(self.siteMembers.memberIds)
         return retval
 
-    @form.action(label='Groups', name='groups', prefix='',
-                 failure='handle_list_failure')
+    @form.action(label='User groups', name='user_groups',
+                 prefix='', failure='handle_list_failure')
     def handle_get_groups(self, action, data):
         '''The form action for the list of members and their groups
 
@@ -69,10 +82,10 @@ class MembersListHook(SiteEndpoint):
             groups = [group.getId()
                       for group in self.groups
                       if user_member_of_group(userInfo, group)]
-            u = ''.join((self.siteInfo.url, userInfo.url))
             r = {'id': userInfo.id,
                  'name': userInfo.name,
-                 'url': u,
+                 'url': ''.join((self.siteInfo.url, userInfo.url)),
+                 'email': self.email_info(userInfo),
                  'groups': groups}
             usergroups.append(r)
 
