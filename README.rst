@@ -91,7 +91,7 @@ Example
   [
     {
       "id": "qK7SgjsTHcLNrJ2ClevcJ0",
-      "name": "A Person"
+      "name": "A Person",
       "url": "https://groups.example.com/p/aperson",
       "email": {
         "all": [
@@ -109,11 +109,11 @@ Example
       "groups": [
         "example",
         "test"
-      ],
+      ]
     },
     {
       "id": "HgTvjLrc7ecJNK0JCs2lSq",
-      "name": "Another Person"
+      "name": "Another Person",
       "url": "https://groups.example.com/p/HgTvjLrc7ecJNK0JCs2lSq",
       "email": {
         "all": [
@@ -127,7 +127,7 @@ Example
       },
       "groups": [
         "example"
-      ],
+      ]
     }
   ]
 
