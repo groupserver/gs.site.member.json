@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser"
+           xmlns:five="http://namespaces.zope.org/five"
+           i18n_domain="gs.site.member.json">
+
+  <browser:page
+    name="gs-site-member-list.json"
+    for="Products.GSContent.interfaces.IGSSiteFolder"
+    class=".members.MembersListHook"
+    permission="zope2.Public"/>
+
+</configure>
