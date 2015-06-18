@@ -22,7 +22,7 @@ from zope.formlib import form
 from gs.auth.token import log_auth_error
 from gs.content.form.api.json import SiteEndpoint
 from gs.group.member.base import user_member_of_group
-from gs.profile.email.base import EmailUser
+from gs.profile.json import user_info, email_info
 from gs.site.member.base import SiteMembers
 from .interfaces import IMembersList
 
@@ -46,18 +46,6 @@ class MembersListHook(SiteEndpoint):
                   if folder.getProperty('is_group', False)]
         return retval
 
-    def email_info(self, userInfo):
-        eu = EmailUser(self.context, userInfo)
-        allEmail = eu.get_addresses()
-        preferred = eu.get_delivery_addresses()
-        unverified = eu.get_unverified_addresses()
-        other = list(set(allEmail) - set(preferred) - set(unverified))
-        retval = {'all': allEmail,
-                  'preferred': preferred,
-                  'other': other,
-                  'unverified': unverified, }
-        return retval
-
     @form.action(label='Users', name='users', prefix='',
                  failure='handle_list_failure')
     def handle_get_list(self, action, data):
@@ -79,14 +67,11 @@ class MembersListHook(SiteEndpoint):
         for userId in self.siteMembers.memberIds:
             userInfo = createObject('groupserver.UserFromId',
                                     self.context, userId)
-            groups = [group.getId()
-                      for group in self.groups
-                      if user_member_of_group(userInfo, group)]
-            r = {'id': userInfo.id,
-                 'name': userInfo.name,
-                 'url': ''.join((self.siteInfo.url, userInfo.url)),
-                 'email': self.email_info(userInfo),
-                 'groups': groups}
+            r = user_info(self.siteInfo, userInfo)
+            r['email'] = email_info(self.siteInfo, userInfo)
+            # So the list of groups is cached
+            r['groups'] = [group.getId() for group in self.groups
+                           if user_member_of_group(userInfo, group)]
             usergroups.append(r)
 
         retval = to_json(usergroups)
