@@ -56,5 +56,6 @@ setup(name=name,
           'zope.browserpage',
           'gs.site.member.base',
       ],
+      extras_require={'docs': ['Sphinx']},
       entry_points="""# -*- Entry points: -*-
       """,)
