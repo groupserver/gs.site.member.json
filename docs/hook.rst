@@ -5,7 +5,7 @@ Web hook
 Synopsis
 ========
 
-``/gs-site-member.json```? :option:`token` =<t> & (:option:`users` | :option:`user_groups`)
+``/gs-site-member.json``? :option:`token` =<t> & (:option:`users` | :option:`user_groups`)
 
 Description
 ===========
