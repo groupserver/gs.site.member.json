@@ -5,12 +5,12 @@ Web hook
 Synopsis
 ========
 
-``/gs-site-member.json``? :option:`token` =<t> & (:option:`users` | :option:`user_groups`)
+``/gs-site-member-list.json``? :option:`token` =<t> & (:option:`users` | :option:`user_groups`)
 
 Description
 ===========
 
-The web hook ``gs-site-member.json`` in the *site* context takes
+The web hook ``gs-site-member-list.json`` in the *site* context takes
 a :option:`token` and returns a JSON_ formatted list of all
 users. What is returned depends on the *action*, which is either
 :option:`users` or :option:`user_groups`.
