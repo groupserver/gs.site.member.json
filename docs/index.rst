@@ -37,7 +37,7 @@ Resources
 =========
 
 - Documentation:
-  http://groupserver.readthedocs.org/projects/gssitememberjson
+  http://groupserver.readthedocs.io/projects/gssitememberjson
 - Code repository:
   https://github.com/groupserver/gs.site.member.json
 - Questions and comments to
